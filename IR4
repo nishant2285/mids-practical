@@ -1,0 +1,26 @@
+
+# Program to Calculate F-measure and E-measure
+
+# Step 1: Input Precision and Recall values
+precision = 0.6
+recall = 1.0
+
+# Step 2: Calculate F-measure (Harmonic Mean)
+if precision + recall != 0:
+    f_measure = (2 * precision * recall) / (precision + recall)
+else:
+    f_measure = 0
+
+# Step 3: Calculate E-measure
+e_measure = 1 - f_measure
+
+# Step 4: Display results
+print("========== F-MEASURE AND E-MEASURE ==========")
+
+print("Precision =", precision)
+print("Recall =", recall)
+
+print("\nF-measure =", round(f_measure, 2))
+print("E-measure =", round(e_measure, 2))
+
+print("=============================================")
