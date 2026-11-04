@@ -1,0 +1,82 @@
+#Implement a program for feature extraction in 2D color images (any features like color, texture etc. and
+extract features from the input image and plot a histogram for the features.
+import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
+
+# Step 1: Load the input image
+image = Image.open("sample.jpg").convert("RGB")
+
+# Step 2: Convert image into NumPy array
+img_array = np.array(image)
+
+# Step 3: Extract RGB color channels
+red = img_array[:, :, 0]
+green = img_array[:, :, 1]
+blue = img_array[:, :, 2]
+
+# Step 4: Display image dimensions
+print("========== IMAGE FEATURE EXTRACTION ==========")
+
+print("Image Width:", image.width)
+print("Image Height:", image.height)
+
+# Step 5: Calculate mean RGB features
+print("\nMean RGB Features:")
+
+print("Red Mean:", round(np.mean(red), 2))
+print("Green Mean:", round(np.mean(green), 2))
+print("Blue Mean:", round(np.mean(blue), 2))
+
+# Step 6: Display the input image
+plt.figure(figsize=(6, 5))
+
+plt.imshow(image)
+plt.title("Input Image")
+plt.axis("off")
+
+plt.show()
+
+# Step 7: Plot RGB color histograms
+plt.figure(figsize=(10, 5))
+
+plt.hist(
+    red.ravel(),
+    bins=256,
+    range=(0, 256),
+    color="red",
+    alpha=0.5,
+    label="Red"
+)
+
+plt.hist(
+    green.ravel(),
+    bins=256,
+    range=(0, 256),
+    color="green",
+    alpha=0.5,
+    label="Green"
+)
+
+plt.hist(
+    blue.ravel(),
+    bins=256,
+    range=(0, 256),
+    color="blue",
+    alpha=0.5,
+    label="Blue"
+)
+
+# Step 8: Add histogram labels and title
+plt.title("RGB Color Histogram")
+plt.xlabel("Pixel Intensity")
+plt.ylabel("Frequency")
+
+plt.legend()
+plt.grid(alpha=0.2)
+
+# Display histogram
+plt.show()
+
+print("\nRGB Feature Extraction Completed!")
+print("=============================================")
