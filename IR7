@@ -1,0 +1,66 @@
+#Build the web crawler to pull product information and links from an e-commerce website. (Python)
+import requests
+from bs4 import BeautifulSoup
+import csv
+
+# Step 1: Website URL
+url = "https://books.toscrape.com/"
+
+# Step 2: Send HTTP request to website
+response = requests.get(url, timeout=15)
+
+# Step 3: Check website response
+if response.status_code == 200:
+
+    print("Website connected successfully!\n")
+
+    # Parse HTML content
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    # Find all product containers
+    products = soup.find_all("article", class_="product_pod")
+
+    # Step 4: Open CSV file
+    with open(
+        "products.csv",
+        "w",
+        newline="",
+        encoding="utf-8"
+    ) as file:
+
+        writer = csv.writer(file)
+
+        # Write CSV header
+        writer.writerow(["Product Name", "Price", "Link"])
+
+        # Step 5: Extract product information
+        for product in products:
+
+            # Extract product name
+            name = product.h3.a["title"]
+
+            # Extract product price
+            price = product.find(
+                "p",
+                class_="price_color"
+            ).text
+
+            # Extract product link
+            link = product.h3.a["href"]
+
+            # Convert relative URL into full URL
+            full_link = requests.compat.urljoin(url, link)
+
+            # Display product information
+            print("Product:", name)
+            print("Price:", price)
+            print("Link:", full_link)
+            print("------------------------------")
+
+            # Save product information into CSV
+            writer.writerow([name, price, full_link])
+
+    print("\nProduct information saved in products.csv")
+
+else:
+    print("Website request failed:", response.status_code)
