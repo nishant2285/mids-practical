@@ -1,0 +1,39 @@
+
+# Program to Calculate Precision and Recall
+
+# Step 1: Define document sets
+A = {"D1", "D2", "D3", "D4", "D5"}
+
+Rq1 = {"D1", "D2", "D3"}
+
+# Step 2: Find relevant retrieved documents
+relevant_retrieved = A.intersection(Rq1)
+
+# Step 3: Calculate True Positives (TP)
+TP = len(relevant_retrieved)
+
+# Step 4: Calculate total retrieved and relevant documents
+retrieved = len(A)
+relevant = len(Rq1)
+
+# Step 5: Calculate Precision and Recall
+precision = TP / retrieved if retrieved != 0 else 0
+
+recall = TP / relevant if relevant != 0 else 0
+
+# Step 6: Display results
+print("========== PRECISION AND RECALL ==========")
+
+print("Answer Set A:", A)
+print("Relevant Documents:", Rq1)
+
+print("\nRelevant Retrieved Documents:", relevant_retrieved)
+
+print("Total Retrieved Documents:", retrieved)
+print("Total Relevant Documents:", relevant)
+print("True Positives (TP):", TP)
+
+print("\nPrecision =", round(precision, 2))
+print("Recall =", round(recall, 2))
+
+print("==========================================")
