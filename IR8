@@ -1,0 +1,80 @@
+#Write a program to find the live weather report (temperature, wind speed, description, and weather) of a given city. (Python).
+import requests
+
+# Step 1: Enter city name
+city = input("Enter city name: ")
+
+# Step 2: Find city coordinates using Geocoding API
+geo_url = "https://geocoding-api.open-meteo.com/v1/search"
+
+geo_params = {
+    "name": city,
+    "count": 1,
+    "language": "en",
+    "format": "json"
+}
+
+geo_response = requests.get(geo_url, params=geo_params, timeout=15)
+geo_data = geo_response.json()
+
+# Step 3: Check whether city exists
+if "results" not in geo_data or not geo_data["results"]:
+    print("City not found!")
+
+else:
+    location = geo_data["results"][0]
+
+    latitude = location["latitude"]
+    longitude = location["longitude"]
+
+    # Step 4: Get current weather information
+    weather_url = "https://api.open-meteo.com/v1/forecast"
+
+    weather_params = {
+        "latitude": latitude,
+        "longitude": longitude,
+        "current": "temperature_2m,wind_speed_10m,weather_code"
+    }
+
+    response = requests.get(
+        weather_url,
+        params=weather_params,
+        timeout=15
+    )
+
+    weather_data = response.json()
+
+    current = weather_data["current"]
+
+    # Step 5: Weather code descriptions
+    weather_codes = {
+        0: "Clear Sky",
+        1: "Mainly Clear",
+        2: "Partly Cloudy",
+        3: "Overcast",
+        45: "Fog",
+        48: "Depositing Rime Fog",
+        51: "Light Drizzle",
+        61: "Slight Rain",
+        63: "Moderate Rain",
+        65: "Heavy Rain",
+        71: "Slight Snow",
+        80: "Rain Showers",
+        95: "Thunderstorm"
+    }
+
+    code = current["weather_code"]
+    description = weather_codes.get(
+        code, "Other Weather Condition"
+    )
+
+    # Step 6: Display weather report
+    print("\n------ LIVE WEATHER REPORT ------")
+
+    print("City:", location["name"])
+    print("Temperature:", current["temperature_2m"], "°C")
+    print("Wind Speed:", current["wind_speed_10m"], "km/h")
+    print("Weather:", description)
+    print("Weather Code:", code)
+
+    print("---------------------------------")
