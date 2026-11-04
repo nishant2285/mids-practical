@@ -1,0 +1,47 @@
+#Implement a Conflation algorithm to generate a document representative of a text file.
+
+import re
+
+# Step 1: Define conflation function
+def conflate(word):
+
+    # Convert word into lowercase
+    word = word.lower()
+
+    # Common suffixes
+    suffixes = ["ing", "ed", "es", "s"]
+
+    # Remove common suffixes
+    for suffix in suffixes:
+
+        if word.endswith(suffix) and len(word) > len(suffix) + 2:
+            word = word[:-len(suffix)]
+            break
+
+    return word
+
+
+# Step 2: Read text from a file
+with open("document.txt", "r", encoding="utf-8") as file:
+    text = file.read()
+
+
+# Step 3: Extract words using Regular Expression
+words = re.findall(r"\b[a-zA-Z]+\b", text)
+
+
+# Step 4: Generate document representative
+representative = []
+
+for word in words:
+    representative.append(conflate(word))
+
+
+# Step 5: Display original document
+print("\n========== ORIGINAL DOCUMENT ==========")
+print(text)
+
+
+# Step 6: Display document representative
+print("\n========== DOCUMENT REPRESENTATIVE ==========")
+print(" ".join(representative))
