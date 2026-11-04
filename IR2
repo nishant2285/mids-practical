@@ -1,0 +1,82 @@
+#Implement Single-pass Algorithm for the clustering of files. (Consider 4 to 5 files)
+import re
+from pathlib import Path
+from collections import defaultdict
+
+
+# Step 1: Define tokenization function
+def tokenize(text):
+
+    # Convert text into lowercase and extract words
+    return re.findall(r"\b[a-z]+\b", text.lower())
+
+
+# Step 2: Read all text files from documents folder
+folder = Path("documents")
+
+files = sorted(folder.glob("*.txt"))
+
+
+# Step 3: Check whether text files are available
+if not files:
+
+    print("No text files found in the documents folder.")
+    raise SystemExit
+
+
+# Step 4: Create an inverted index
+inverted_index = defaultdict(set)
+
+
+for file in files:
+
+    # Read file content
+    text = file.read_text(encoding="utf-8")
+
+    # Extract unique words
+    words = set(tokenize(text))
+
+    # Store word and corresponding filename
+    for word in words:
+        inverted_index[word].add(file.name)
+
+
+# Step 5: Display inverted index
+print("\n========== INVERTED INDEX ==========")
+
+for word in sorted(inverted_index):
+
+    print(f"{word}: {sorted(inverted_index[word])}")
+
+
+# Step 6: Accept search query from user
+query = input("\nEnter search words: ")
+
+query_words = set(tokenize(query))
+
+
+# Step 7: Search documents using AND operation
+if not query_words:
+
+    print("Please enter a valid search query.")
+
+else:
+
+    results = set.intersection(
+        *(
+            inverted_index.get(word, set())
+            for word in query_words
+        )
+    )
+
+    # Step 8: Display retrieved documents
+    print("\n========== RETRIEVED DOCUMENTS ==========")
+
+    if results:
+
+        for name in sorted(results):
+            print(name)
+
+    else:
+
+        print("No matching documents found.")
