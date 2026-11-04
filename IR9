@@ -1,0 +1,89 @@
+
+#Case study on recommender system for a product / Doctor / Product price / Music.
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Step 1: Create product dataset
+data = {
+    "Product": [
+        "Laptop",
+        "Gaming Laptop",
+        "Smartphone",
+        "Headphones",
+        "Tablet",
+        "Smart Watch"
+    ],
+
+    "Description": [
+        "Laptop computer with 8GB RAM and SSD",
+        "Gaming laptop with 16GB RAM and graphics card",
+        "Smartphone with camera and touchscreen",
+        "Wireless headphones with good sound quality",
+        "Tablet with touchscreen and long battery",
+        "Smart watch with fitness and health tracking"
+    ]
+}
+
+# Step 2: Convert dataset into DataFrame
+df = pd.DataFrame(data)
+
+# Step 3: Convert product descriptions into numerical features
+vectorizer = TfidfVectorizer()
+
+features = vectorizer.fit_transform(df["Description"])
+
+# Step 4: Calculate cosine similarity
+similarity = cosine_similarity(features)
+
+# Step 5: Display available products
+print("\n========== AVAILABLE PRODUCTS ==========")
+
+for product in df["Product"]:
+    print("-", product)
+
+# Step 6: Get product choice from user
+choice = input("\nEnter product name: ").strip()
+
+# Step 7: Check whether product exists
+if choice not in df["Product"].values:
+    print("\nProduct not found!")
+
+else:
+    # Find the index of selected product
+    index = df[df["Product"] == choice].index[0]
+
+    # Get similarity scores
+    scores = list(enumerate(similarity[index]))
+
+    # Sort products by similarity (highest first)
+    scores = sorted(
+        scores,
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    # Step 8: Display recommended products
+    print("\n========== RECOMMENDED PRODUCTS ==========")
+
+    count = 0
+
+    for i, score in scores:
+
+        # Skip the selected product itself
+        if i != index:
+
+            print(
+                df["Product"][i],
+                "- Similarity:",
+                round(score * 100, 2),
+                "%"
+            )
+
+            count += 1
+
+        # Display only top 3 recommendations
+        if count == 3:
+            break
+
+    print("==========================================")
