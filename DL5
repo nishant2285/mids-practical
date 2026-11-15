@@ -1,0 +1,49 @@
+#Implement the Continuous Bag of Words (CBOW) Model
+import numpy as np
+import re
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Input, Embedding, GlobalAveragePooling1D, Dense
+from tensorflow.keras.utils import to_categorical
+ 
+# Stage 1. Data preparation
+corpus = """Deep learning is a subset of machine learning. Machine learning is a part of
+artificial intelligence. Neural networks are used in deep learning. Deep learning models
+learn features from data. Artificial intelligence is changing the world."""
+corpus = re.sub(r'[^a-z ]', '', corpus.lower().replace("\n", " "))
+words = corpus.split()
+vocab = sorted(set(words))
+word2id = {w: i for i, w in enumerate(vocab)}
+id2word = {i: w for w, i in word2id.items()}
+V, dim, window = len(vocab), 10, 2
+print("Vocabulary size:", V)
+ 
+# Stage 2. Generate training data (context words -> target word)
+X, Y = [], []
+ids = [word2id[w] for w in words]
+for i in range(window, len(ids) - window):
+    context = ids[i - window:i] + ids[i + 1:i + window + 1]
+    X.append(context); Y.append(ids[i])
+X = np.array(X); Y = to_categorical(Y, V)
+print("Training samples:", X.shape)
+print("Sample -> context:", [id2word[j] for j in X[0]], " target:", id2word[Y[0].argmax()])
+ 
+# Stage 3. Train model (average of context embeddings -> softmax over vocabulary)
+model = Sequential([
+    Input(shape=(2 * window,)),
+    Embedding(V, dim),
+    GlobalAveragePooling1D(),
+    Dense(V, activation="softmax")
+])
+model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
+model.summary()
+hist = model.fit(X, Y, epochs=100, verbose=0)
+for e in (0, 24, 49, 74, 99):
+    print(f"Epoch {e+1:3d}  loss: {hist.history['loss'][e]:.4f}  accuracy: {hist.history['accuracy'][e]:.4f}")
+ 
+# Stage 4. Output
+weights = model.layers[0].get_weights()[0]
+for w in ["deep", "learning", "intelligence"]:
+    print(f"Embedding of '{w}':", np.round(weights[word2id[w]], 3))
+test = ["machine", "learning", "part", "artificial"]
+pred = model.predict(np.array([[word2id[w] for w in test]]), verbose=0)
+print("Context:", test, "-> Predicted word:", id2word[pred.argmax()])
