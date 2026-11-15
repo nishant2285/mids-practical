@@ -1,0 +1,51 @@
+# a. Import the necessary packages
+#Implementing Feedforward neural networks with Keras and TensorFlow (MNIST, SGD)
+import numpy as np
+import matplotlib.pyplot as plt
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten, Input
+from tensorflow.keras.optimizers import SGD
+from tensorflow.keras.utils import to_categorical
+from sklearn.metrics import classification_report
+ 
+# b. Load the training and testing data
+(trainX, trainY), (testX, testY) = mnist.load_data()
+trainX = trainX.astype("float32") / 255.0
+testX = testX.astype("float32") / 255.0
+trainY_c = to_categorical(trainY, 10)
+testY_c = to_categorical(testY, 10)
+print("Train shape:", trainX.shape, " Test shape:", testX.shape)
+ 
+# c. Define the network architecture using Keras
+model = Sequential([
+    Input(shape=(28, 28)),
+    Flatten(),
+    Dense(256, activation="sigmoid"),
+    Dense(128, activation="sigmoid"),
+    Dense(10, activation="softmax")
+])
+model.summary()
+ 
+# d. Train the model using SGD
+model.compile(loss="categorical_crossentropy", optimizer=SGD(learning_rate=0.01),
+              metrics=["accuracy"])
+H = model.fit(trainX, trainY_c, validation_data=(testX, testY_c),
+              epochs=10, batch_size=128, verbose=2)
+ 
+# e. Evaluate the network
+preds = model.predict(testX, verbose=0)
+print(classification_report(testY, preds.argmax(axis=1)))
+loss, acc = model.evaluate(testX, testY_c, verbose=0)
+print(f"Test loss: {loss:.4f}  Test accuracy: {acc:.4f}")
+ 
+# f. Plot the training loss and accuracy
+plt.style.use("ggplot")
+plt.figure(figsize=(8, 5))
+plt.plot(H.history["loss"], label="train_loss")
+plt.plot(H.history["val_loss"], label="val_loss")
+plt.plot(H.history["accuracy"], label="train_acc")
+plt.plot(H.history["val_accuracy"], label="val_acc")
+plt.title("Training Loss and Accuracy (MNIST) - sohamwani")
+plt.xlabel("Epoch"); plt.ylabel("Loss / Accuracy"); plt.legend()
+plt.show()
