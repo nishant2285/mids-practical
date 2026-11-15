@@ -1,0 +1,33 @@
+#Study of Deep learning Packages: Tensorflow, Keras, Theano and PyTorch. Document the distinct features and functionality of the packages.
+import tensorflow as tf
+import keras
+import torch
+ 
+print("TensorFlow version :", tf.__version__)
+print("Keras version      :", keras.__version__)
+print("PyTorch version    :", torch.__version__)
+try:
+    import theano
+    print("Theano version     :", theano.__version__)
+except Exception:
+    print("Theano not installed (project discontinued; use pip install theano-pymc)")
+ 
+# TensorFlow: tensors and automatic differentiation
+x = tf.Variable(3.0)
+with tf.GradientTape() as tape:
+    y = x ** 2
+print("TF    dy/dx at x=3 :", tape.gradient(y, x).numpy())
+ 
+# PyTorch: tensors and autograd
+a = torch.tensor(3.0, requires_grad=True)
+b = a ** 2
+b.backward()
+print("Torch dy/dx at a=3 :", a.grad.item())
+ 
+# Keras: a quick model
+model = keras.Sequential([keras.Input(shape=(4,)),
+                          keras.layers.Dense(8, activation="relu"),
+                          keras.layers.Dense(1)])
+model.summary()
+print("GPUs (TF)    :", tf.config.list_physical_devices('GPU'))
+print("CUDA (Torch) :", torch.cuda.is_available())
